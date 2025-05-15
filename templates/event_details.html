@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event['Title'] }} - Event Details</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+             padding: 0;
+
+            
+            background-color: black;
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Lobster', cursive;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3em;
+            color: white;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background-color: #333;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .card-img-top {
+            border-radius: 10px 10px 0 0;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-text p {
+            margin-bottom: 10px;
+        }
+
+        .book-ticket {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .book-ticket a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .book-ticket a:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        #priya{
+            opacity: 0.7;
+             font-family: 'Lobster', sans-serif; 
+             margin: 0%;
+        }
+    </style>
+</head>
+<body>
+    <div id="priya">
+        <h10>Made By Priyanjal Durgapal</h10>
+     </div>
+    <div class="container">
+        <h1>{{ event['Title'] }}</h1>
+
+        <div class="card">
+            <img src="{{ event['Image'] }}" class="card-img-top" alt="{{ event['Title'] }}">
+            <div class="card-body">
+                <div class="card-text">
+                    <p><strong>Date:</strong> {{ event['Date'] }}</p>
+                    <p><strong>Place:</strong> {{ event['Place'] }}</p>
+                </div>
+                <div class="book-ticket">
+                    <a href="{{ url_for('registration_form', event_id=event['id']) }}">Register for this Event</a>
+                </div>
+            </div>
+        </div>
