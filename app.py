@@ -1,54 +1,61 @@
 from flask import Flask, render_template, request, redirect
-from flask_mysqldb import MySQL
-from sceap import scrape_events  
+from flask_sqlalchemy import SQLAlchemy
+from scrape import scrape_events
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+db_url = os.getenv('DATABASE_URL')
+if not db_url:
+    raise ValueError("DATABASE_URL environment variable not set")
 
 app = Flask(__name__)
 
-# MySQL Confi
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'  
-app.config['MYSQL_PASSWORD'] = 'root'  
-app.config['MYSQL_DB'] = 'events' 
+# PostgreSQL config via Railway
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-mysql = MySQL(app)
+db = SQLAlchemy(app)
 
-# Main routing
+# Model for registration
+class Registration(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    phone = db.Column(db.String(20))
+    event_id = db.Column(db.Integer)
+
+# Main route
 @app.route('/')
 def index():
-    events = scrape_events() 
+    events = scrape_events()
     return render_template('index.html', events=events)
 
-# Event details route
 @app.route('/event/<int:event_id>')
 def event_details(event_id):
-    events = scrape_events()  
-    event = events[event_id]  
+    events = scrape_events()
+    event = events[event_id]
     return render_template('event_details.html', event=event)
-
 
 @app.route('/register/<int:event_id>', methods=['GET', 'POST'])
 def registration_form(event_id):
-    events = scrape_events()  
-    event = events[event_id]  
-    
+    events = scrape_events()
+    event = events[event_id]
+
     if request.method == 'POST':
-        
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
-        
-        
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO registrations (name, email, phone, event_id) VALUES (%s, %s, %s, %s)",
-                    (name, email, phone, event_id))
-        mysql.connection.commit()
-        cur.close()
-        
-        
-        ticket_url = event['Book Ticket']
-        return redirect(ticket_url)
+
+        new_reg = Registration(name=name, email=email, phone=phone, event_id=event_id)
+        db.session.add(new_reg)
+        db.session.commit()
+
+        return redirect(event['Book Ticket'])
 
     return render_template('registration_form.html', event=event)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
